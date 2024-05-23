@@ -32,7 +32,7 @@ export const posts = createTable(
   (example) => ({
     createdByIdIdx: index("createdById_idx").on(example.createdById),
     nameIndex: index("name_idx").on(example.name),
-  })
+  }),
 );
 
 export const users = createTable("user", {
@@ -43,6 +43,9 @@ export const users = createTable("user", {
     mode: "timestamp",
   }).default(sql`CURRENT_TIMESTAMP`),
   image: text("image", { length: 255 }),
+  role: text("role", {
+    enum: ["USER", "ADMIN", "STAFF"],
+  }).default("USER"),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
@@ -73,7 +76,7 @@ export const accounts = createTable(
       columns: [account.provider, account.providerAccountId],
     }),
     userIdIdx: index("account_userId_idx").on(account.userId),
-  })
+  }),
 );
 
 export const accountsRelations = relations(accounts, ({ one }) => ({
@@ -91,7 +94,7 @@ export const sessions = createTable(
   },
   (session) => ({
     userIdIdx: index("session_userId_idx").on(session.userId),
-  })
+  }),
 );
 
 export const sessionsRelations = relations(sessions, ({ one }) => ({
@@ -107,5 +110,22 @@ export const verificationTokens = createTable(
   },
   (vt) => ({
     compoundKey: primaryKey({ columns: [vt.identifier, vt.token] }),
-  })
+  }),
 );
+
+export const reservations = createTable("reservation", {
+  id: int("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+  name: text("name", { length: 256 }).notNull(),
+  email: text("email", { length: 255 }).notNull(),
+  phone: text("phone", { length: 255 }).notNull(),
+  time: int("time", { mode: "timestamp" }).notNull(),
+  noOfGuests: int("noOfGuests", { mode: "number" }).notNull(),
+  message: text("message", { length: 255 }),
+  createdBy: text("createdBy", { length: 255 })
+    .notNull()
+    .references(() => users.id),
+  createdAt: int("created_at", { mode: "timestamp" })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  updatedAt: int("updatedAt", { mode: "timestamp" }),
+});
