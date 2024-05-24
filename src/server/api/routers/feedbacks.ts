@@ -7,7 +7,7 @@ import {
   staffProcedure,
 } from "@/server/api/trpc";
 import { feedbacks, payment } from "@/server/db/schema";
-import { count, desc, like } from "drizzle-orm";
+import { count, desc, ilike } from "drizzle-orm";
 
 export const feedbacksRouter = createTRPCRouter({
   createFeedback: publicProcedure
@@ -34,13 +34,13 @@ export const feedbacksRouter = createTRPCRouter({
         limit: input.pageSize,
         offset: (input.pageIndex || 0) * (input.pageSize || 0),
         orderBy: desc(payment.id),
-        where: like(feedbacks.email, `%${input.emailFilter || ""}%`),
+        where: ilike(feedbacks.email, `%${input.emailFilter || ""}%`),
       });
 
       const totalCount = await ctx.db
         .select({ count: count() })
         .from(feedbacks)
-        .where(like(feedbacks.email, `%${input.emailFilter || ""}%`));
+        .where(ilike(feedbacks.email, `%${input.emailFilter || ""}%`));
 
       return {
         rows: filteredFeedback,

@@ -1,12 +1,11 @@
 import { menuSchema, updateMenuSchema } from "@/lib/schemas/menus";
 import {
   createTRPCRouter,
-  protectedProcedure,
   publicProcedure,
   staffProcedure,
 } from "@/server/api/trpc";
 import { menuItemsToMenu, menus } from "@/server/db/schema";
-import { and, count, desc, eq, like } from "drizzle-orm";
+import { and, count, desc, eq, ilike } from "drizzle-orm";
 import { z } from "zod";
 
 export const menusRouter = createTRPCRouter({
@@ -59,7 +58,7 @@ export const menusRouter = createTRPCRouter({
         offset: (input.pageIndex || 0) * (input.pageSize || 0),
         orderBy: desc(menus.updatedAt),
         where: input.nameFilter
-          ? like(menus.name, `%${input.nameFilter || ""}%`)
+          ? ilike(menus.name, `%${input.nameFilter || ""}%`)
           : undefined,
       });
 
@@ -68,7 +67,7 @@ export const menusRouter = createTRPCRouter({
         .from(menus)
         .where(
           input.nameFilter
-            ? like(menus.name, `%${input.nameFilter || ""}%`)
+            ? ilike(menus.name, `%${input.nameFilter || ""}%`)
             : undefined,
         );
 

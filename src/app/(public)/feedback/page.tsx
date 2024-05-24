@@ -24,7 +24,7 @@ import { feedbackSchema } from "@/lib/schemas/feedbacks";
 import { api } from "@/trpc/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSession } from "next-auth/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -35,16 +35,20 @@ export default function FeedbackPage() {
 
   const form = useForm<z.infer<typeof feedbackSchema>>({
     resolver: zodResolver(feedbackSchema),
-    defaultValues: {},
-    values: {
-      email: session?.user.email || "",
-      name: session?.user.name || "",
-      phone: "",
-      message: "",
+    defaultValues: {
       rating: 5,
     },
     reValidateMode: "onChange",
   });
+
+  useEffect(() => {
+    if (session) {
+      form.reset({
+        email: session.user.email || "",
+        name: session.user.name || "",
+      });
+    }
+  }, [session]);
 
   const mutation = api.feedbacks.createFeedback.useMutation({
     onMutate: () => {

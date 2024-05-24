@@ -4,7 +4,7 @@ import { paymentSchema } from "@/lib/schemas/payments";
 import { createTRPCRouter, staffProcedure } from "@/server/api/trpc";
 import { payment } from "@/server/db/schema";
 import { sendInvoiceEmail } from "@/server/helpers/emailHelper";
-import { count, desc, like } from "drizzle-orm";
+import { count, desc, ilike } from "drizzle-orm";
 
 export const paymentsRouter = createTRPCRouter({
   createPayment: staffProcedure
@@ -34,7 +34,7 @@ export const paymentsRouter = createTRPCRouter({
         orderBy: desc(payment.id),
         where:
           input.emailFilter && input.emailFilter.length > 0
-            ? like(payment.invoiceEmailAddress, `%${input.emailFilter}%`)
+            ? ilike(payment.invoiceEmailAddress, `%${input.emailFilter}%`)
             : undefined,
       });
 
@@ -42,7 +42,7 @@ export const paymentsRouter = createTRPCRouter({
         .select({ count: count() })
         .from(payment)
         .where(
-          like(payment.invoiceEmailAddress, `%${input.emailFilter || ""}%`),
+          ilike(payment.invoiceEmailAddress, `%${input.emailFilter || ""}%`),
         );
 
       return {

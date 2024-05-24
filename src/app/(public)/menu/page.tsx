@@ -12,7 +12,6 @@ import { api } from "@/trpc/server";
 
 export default async function MenuPage() {
   const menus = await api.menus.getLandingMenu();
-  console.log(menus);
   return (
     <>
       <div className="flex items-center justify-between space-y-2">
@@ -38,11 +37,11 @@ export default async function MenuPage() {
                   return (
                     <div
                       key={menuItem.menuItem.id}
-                      className="flex w-full items-center justify-between gap-2"
+                      className="flex w-full items-start justify-between gap-2 text-sm"
                     >
                       <div>
                         {" "}
-                        <div className="text-md flex gap-3">
+                        <div className="text-md flex items-center gap-3">
                           {menuItem.menuItem.name}
                           <div className="flex gap-2">
                             {menuItem.menuItem.vegan && <Badge>Vegan</Badge>}
@@ -55,7 +54,9 @@ export default async function MenuPage() {
                           {menuItem.menuItem.description}
                         </div>
                       </div>
-                      <div>{formatCurrency(menuItem.menuItem.price)}</div>
+                      <div className="mt-1">
+                        {formatCurrency(menuItem.menuItem.price)}
+                      </div>
                     </div>
                   );
                 })}

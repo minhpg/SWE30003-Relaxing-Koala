@@ -10,7 +10,7 @@ import {
   staffProcedure,
 } from "@/server/api/trpc";
 import { reservations } from "@/server/db/schema";
-import { and, count, desc, eq, like } from "drizzle-orm";
+import { and, count, desc, eq, ilike, like } from "drizzle-orm";
 
 export const reservationsRouter = createTRPCRouter({
   createReservation: protectedProcedure
@@ -105,7 +105,7 @@ export const reservationsRouter = createTRPCRouter({
         offset: (input.pageIndex || 0) * (input.pageSize || 0),
         orderBy: desc(reservations.time),
         where: and(
-          like(reservations.email, `%${input.emailFilter || ""}%`),
+          ilike(reservations.email, `%${input.emailFilter || ""}%`),
           eq(reservations.createdBy, ctx.session.user.id),
         ),
       });
@@ -115,7 +115,7 @@ export const reservationsRouter = createTRPCRouter({
         .from(reservations)
         .where(
           and(
-            like(reservations.email, `%${input.emailFilter || ""}%`),
+            ilike(reservations.email, `%${input.emailFilter || ""}%`),
             eq(reservations.createdBy, ctx.session.user.id),
           ),
         );

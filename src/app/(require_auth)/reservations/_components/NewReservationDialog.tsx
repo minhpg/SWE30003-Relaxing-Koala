@@ -36,7 +36,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { add, format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -48,16 +48,17 @@ export default function NewReservationDialog() {
   const form = useForm<z.infer<typeof reservationSchema>>({
     resolver: zodResolver(reservationSchema),
     defaultValues: {},
-    values: {
-      email: session?.user.email || "",
-      name: session?.user.name || "",
-      phone: "",
-      time: add(new Date(Date.now()), { days: 1 }),
-      noOfGuests: 2,
-      message: "",
-    },
     reValidateMode: "onChange",
   });
+
+  useEffect(() => {
+    if (session) {
+      form.reset({
+        email: session.user.email || "",
+        name: session.user.name || "",
+      });
+    }
+  }, [session]);
 
   const utils = api.useUtils();
 
