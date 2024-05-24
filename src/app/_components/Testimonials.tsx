@@ -1,6 +1,5 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
 import { InfiniteMovingCards } from "@/components/acernity/infinite-moving-cards";
 
 export function Testimonials() {
@@ -18,31 +17,74 @@ export function Testimonials() {
 const testimonials = [
   {
     quote:
-      "It was the best of times, it was the worst of times, it was the age of wisdom, it was the age of foolishness, it was the epoch of belief, it was the epoch of incredulity, it was the season of Light, it was the season of Darkness, it was the spring of hope, it was the winter of despair.",
-    name: "Charles Dickens",
-    title: "A Tale of Two Cities",
+      "Walking into Relaxing Koala Cafe is like stepping into a tranquil oasis. The serene music and the scent of fresh coffee are the perfect escape from the city's hustle.",
+    name: "David Kim",
+    title: "Musician",
   },
   {
     quote:
-      "To be, or not to be, that is the question: Whether 'tis nobler in the mind to suffer The slings and arrows of outrageous fortune, Or to take Arms against a Sea of troubles, And by opposing end them: to die, to sleep.",
-    name: "William Shakespeare",
-    title: "Hamlet",
-  },
-  {
-    quote: "All that we see or seem is but a dream within a dream.",
-    name: "Edgar Allan Poe",
-    title: "A Dream Within a Dream",
+      "The vegan options at Relaxing Koala are incredible! They’ve really outdone themselves with creative, delicious meals that cater to all diets.",
+    name: "Lisa Marie",
+    title: "Vegan Lifestyle Blogger",
   },
   {
     quote:
-      "It is a truth universally acknowledged, that a single man in possession of a good fortune, must be in want of a wife.",
-    name: "Jane Austen",
-    title: "Pride and Prejudice",
+      "It's not just the food that brings me back to Relaxing Koala, but the sense of community. It's a place where everyone knows your name and treats you like family.",
+    name: "Robert Johnson",
+    title: "Community Organizer",
   },
   {
     quote:
-      "Call me Ishmael. Some years ago—never mind how long precisely—having little or no money in my purse, and nothing particular to interest me on shore, I thought I would sail about a little and see the watery part of the world.",
-    name: "Herman Melville",
-    title: "Moby-Dick",
+      "I had the best latte of my life at Relaxing Koala! Their barista is a true artist.",
+    name: "Sophia Park",
+    title: "Coffee Enthusiast",
+  },
+  {
+    quote:
+      "Relaxing Koala's outdoor seating area is my favorite spot. It's perfect for reading a book or just enjoying the weather, surrounded by beautiful greenery.",
+    name: "James Franco",
+    title: "Novelist",
+  },
+  {
+    quote:
+      "The staff at Relaxing Koala always make sure my dietary restrictions are accommodated with a smile. It’s refreshing to dine where your needs are taken seriously.",
+    name: "Emily Watson",
+    title: "Nutritionist",
+  },
+  {
+    quote:
+      "Their seasonal menu keeps me coming back! The ingredients are always fresh, and the dishes are bursting with flavor.",
+    name: "Marco Gonzalez",
+    title: "Chef",
+  },
+  {
+    quote:
+      "Every time I visit Relaxing Koala, I try a new pastry, and I'm never disappointed. They have the best sweets in town!",
+    name: "Anna Brown",
+    title: "Pastry Chef",
+  },
+  {
+    quote:
+      "Relaxing Koala Cafe is the perfect place for a first date—cozy and intimate, with food that impresses.",
+    name: "Oliver Stone",
+    title: "Relationship Coach",
+  },
+  {
+    quote:
+      "As a freelancer, finding a comfortable place to work is key, and Relaxing Koala is just that. Great Wi-Fi, great coffee, great vibes.",
+    name: "Sarah Morton",
+    title: "Freelance Graphic Designer",
+  },
+  {
+    quote:
+      "The tea selection is exquisite! Each blend has its own unique story that the knowledgeable staff is always eager to share.",
+    name: "Grace Choi",
+    title: "Tea Connoisseur",
+  },
+  {
+    quote:
+      "I held a small workshop at Relaxing Koala, and the accommodating space coupled with attentive service made it a seamless experience.",
+    name: "Henry Tate",
+    title: "Corporate Trainer",
   },
 ];

@@ -1,4 +1,5 @@
 import { BentoGrid, BentoGridItem } from "@/components/acernity/bento-grid";
+import Image from "next/image";
 
 export function MenuBentoGrid() {
   return (
@@ -21,46 +22,101 @@ const Skeleton = () => (
 );
 const items = [
   {
-    title: "The Dawn of Innovation",
-    description: "Explore the birth of groundbreaking ideas and inventions.",
-    header: <Skeleton />,
-    // icon: <IconClipboardCopy className="h-4 w-4 text-neutral-500" />,
-  },
-  {
-    title: "The Digital Revolution",
-    description: "Dive into the transformative power of technology.",
-    header: <Skeleton />,
-    // icon: <IconFileBroken className="h-4 w-4 text-neutral-500" />,
-  },
-  {
-    title: "The Art of Design",
-    description: "Discover the beauty of thoughtful and functional design.",
-    header: <Skeleton />,
-    // icon: <IconSignature className="h-4 w-4 text-neutral-500" />,
-  },
-  {
-    title: "The Power of Communication",
+    title: "Culinary Innovations",
     description:
-      "Understand the impact of effective communication in our lives.",
-    header: <Skeleton />,
-    // icon: <IconTableColumn className="h-4 w-4 text-neutral-500" />,
+      "Explore groundbreaking ideas in cuisine that blend traditional flavors with modern twists.",
+    header: (
+      <Image
+        className="h-[18rem] rounded-xl object-cover"
+        src="/images/tomas-jasovsky-d5SZqLkpIrY-unsplash.jpg"
+        width={1000}
+        height={1000}
+        alt=""
+      />
+    ),
   },
   {
-    title: "The Pursuit of Knowledge",
-    description: "Join the quest for understanding and enlightenment.",
-    header: <Skeleton />,
-    // icon: <IconArrowWaveRightUp className="h-4 w-4 text-neutral-500" />,
+    title: "Digital Gastronomy",
+    description:
+      "Dive into how technology enhances our dining experience, from farm to table.",
+    header: (
+      <Image
+        className="h-[18rem] rounded-xl object-cover"
+        src="/images/keghan-crossland-ZZxmc66SjfM-unsplash.jpg"
+        width={1000}
+        height={1000}
+        alt=""
+      />
+    ),
   },
   {
-    title: "The Joy of Creation",
-    description: "Experience the thrill of bringing ideas to life.",
-    header: <Skeleton />,
-    // icon: <IconBoxAlignTopLeft className="h-4 w-4 text-neutral-500" />,
+    title: "The Art of Plating",
+    description:
+      "Discover the beauty of thoughtful and functional culinary design in each dish served.",
+    header: (
+      <Image
+        className="h-[18rem] rounded-xl object-cover"
+        src="/images/sincerely-media-VNsdEl1gORk-unsplash.jpg"
+        width={1000}
+        height={1000}
+        alt=""
+      />
+    ),
   },
   {
-    title: "The Spirit of Adventure",
-    description: "Embark on exciting journeys and thrilling discoveries.",
-    header: <Skeleton />,
-    // icon: <IconBoxAlignRightFilled className="h-4 w-4 text-neutral-500" />,
+    title: "Conversations at the Cafe",
+    description:
+      "Understand the impact of effective communication over a cup of coffee in our lives.",
+    header: (
+      <Image
+        className="h-[18rem] rounded-xl object-cover"
+        src="/images/rr-abrot-pNIgH0y3upM-unsplash.jpg"
+        width={1000}
+        height={1000}
+        alt=""
+      />
+    ),
+  },
+  {
+    title: "A Taste of Knowledge",
+    description:
+      "Join the quest for culinary understanding and enlightenment through diverse flavors.",
+    header: (
+      <Image
+        className="h-[18rem] rounded-xl object-cover"
+        src="/images/mihai-moisa-Djtc1T38-GY-unsplash.jpg"
+        width={1000}
+        height={1000}
+        alt=""
+      />
+    ),
+  },
+  {
+    title: "The Joy of Culinary Creations",
+    description:
+      "Experience the thrill of creating and tasting innovative dishes at our cafe.",
+    header: (
+      <Image
+        className="h-[18rem] rounded-xl object-cover"
+        src="/images/breakslow-E6RTpqvOasU-unsplash.jpg"
+        width={1000}
+        height={1000}
+        alt=""
+      />
+    ),
+  },
+  {
+    title: "Adventures in Flavor",
+    description:
+      "Embark on exciting journeys and thrilling discoveries in every meal.",
+    header: (
+      <Image
+        className="h-[18rem] rounded-xl object-cover"
+        src="/images/nathan-dumlao-6VhPY27jdps-unsplash.jpg"
+        width={1000}
+        height={1000}
+        alt=""
+      />
+    ),
   },
 ];
