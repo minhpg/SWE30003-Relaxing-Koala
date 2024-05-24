@@ -1,5 +1,3 @@
-import { cn } from "@/lib/utils";
-import React from "react";
 import { BentoGrid, BentoGridItem } from "@/components/acernity/bento-grid";
 
 export function MenuBentoGrid() {

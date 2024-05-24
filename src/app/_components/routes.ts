@@ -11,4 +11,8 @@ export const routes = [
     name: "Menu",
     href: "/menu",
   },
+  {
+    name: "Feedback",
+    href: "/feedback",
+  },
 ];

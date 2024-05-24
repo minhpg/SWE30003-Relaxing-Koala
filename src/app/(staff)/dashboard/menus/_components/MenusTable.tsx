@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -14,6 +13,7 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -24,11 +24,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 
-import { api } from "@/trpc/react";
-import { InferSelectModel } from "drizzle-orm";
-import { reservations } from "@/server/db/schema";
-import { format } from "date-fns";
-import { ChevronDown } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -37,15 +33,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { menus } from "@/server/db/schema";
+import { api } from "@/trpc/react";
+import { InferSelectModel } from "drizzle-orm";
+import { ChevronDown } from "lucide-react";
+import MenuActions from "./MenuActions";
 
-export interface UsersTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-}
+export type MenuItem = InferSelectModel<typeof menus>;
 
-export type Reservation = InferSelectModel<typeof reservations>;
-
-export const columns: ColumnDef<Reservation>[] = [
+export const columns: ColumnDef<MenuItem>[] = [
   {
     accessorKey: "name",
     header: "Name",
@@ -54,146 +50,33 @@ export const columns: ColumnDef<Reservation>[] = [
     },
   },
   {
-    accessorKey: "email",
-    header: "Email",
-  },
-  {
-    accessorKey: "phone",
-    header: "Phone",
-  },
-  {
-    accessorKey: "time",
-    header: "Time",
+    accessorKey: "recommended",
+    header: "Recommended",
     cell: ({ row }) => {
-      return format(row.original.time, "dd/MM/yyyy - hh:mm");
+      return (
+        <Badge variant={row.original.recommended ? "default" : "outline"}>
+          {row.original.recommended ? "Yes" : "No"}
+        </Badge>
+      );
     },
   },
   {
-    accessorKey: "message",
-    header: "Message",
+    accessorKey: "description",
+    header: "Description",
     cell: ({ row }) => {
-      return <Input disabled value={row.original.message || ""} />;
+      return <Input disabled value={row.original.description || ""} />;
     },
   },
-  // {
-  //   accessorKey: "createdAt",
-  //   header: "Created at",
-  //   cell: ({ row }) => {
-  //     return format(row.original.createdAt, "dd/MM/yyyy");
-  //   },
-  // },
-  // {
-  //   accessorKey: "role",
-  //   header: "Role",
-  //   cell: ({ row }) => {
-  //     const toast = useToast();
-  //     // const utils = api.useUtils();
-
-  //     // const roleMutation = api..updateUserRole.useMutation({
-  //     //   onSuccess: () => {
-  //     //     toast.toast({
-  //     //       title: "Update success",
-  //     //       description: `Updated role for ${row.original.name} - ${row.original.email}`,
-  //     //     });
-  //     //     // utils.users.getUsersPaginated.refetch();
-  //     //   },
-  //     //   onError: () => {
-  //     //     toast.toast({
-  //     //       title: "Update failed",
-  //     //       description: `Fail to update role for ${row.original.name} - ${row.original.email}`,
-  //     //       variant: "destructive",
-  //     //     });
-  //     //   },
-  //     // });
-
-  //     return (
-  //       <Select
-  //         defaultValue={row.original.role || "Not selected"}
-  //         onValueChange={async (value) => {
-  //           await roleMutation.mutate({
-  //             userId: row.original.id,
-  //             role: value as (typeof roles)[number],
-  //           });
-  //         }}
-  //       >
-  //         <SelectTrigger>
-  //           <SelectValue></SelectValue>
-  //         </SelectTrigger>
-  //         <SelectContent>
-  //           {roles.map((role) => (
-  //             <SelectItem value={role} key={role}>
-  //               {role}
-  //             </SelectItem>
-  //           ))}
-  //         </SelectContent>
-  //       </Select>
-  //     );
-  //   },
-  // },
-  // {
-  //   accessorKey: "organizationId",
-  //   header: "Organization",
-  //   cell: ({ row }) => {
-  //     const toast = useToast();
-  //     // const utils = api.useUtils();
-
-  //     const roleMutation = api.users.updateUserOrganization.useMutation({
-  //       onSuccess: () => {
-  //         toast.toast({
-  //           title: "Update success",
-  //           description: `Updated organization for ${row.original.name} - ${row.original.email}`,
-  //         });
-  //         // utils.users.getUsersPaginated.refetch();
-  //       },
-  //       onError: () => {
-  //         toast.toast({
-  //           title: "Update failed",
-  //           description: `Fail to update organization for ${row.original.name} - ${row.original.email}`,
-  //           variant: "destructive",
-  //         });
-  //       },
-  //     });
-
-  //     const { data: organizations } =
-  //       api.organizations.getOrganizationsPaginated.useQuery({
-  //         pageIndex: 0,
-  //         pageSize: 10,
-  //       });
-
-  //     return (
-  //       <Select
-  //         defaultValue={row.original.organizationId || "Not selected"}
-  //         onValueChange={async (value) => {
-  //           await roleMutation.mutate({
-  //             userId: row.original.id,
-  //             organizationId: value as string,
-  //           });
-  //         }}
-  //       >
-  //         <SelectTrigger>
-  //           <SelectValue placeholder="Select an organization"></SelectValue>
-  //         </SelectTrigger>
-  //         <SelectContent>
-  //           {!organizations && (
-  //             <div className="flex w-full justify-center">
-  //               <RiLoader4Fill className="h-6 w-6 animate-spin text-primary" />
-  //             </div>
-  //           )}
-
-  //           {organizations &&
-  //             organizations.rows.map((org) => (
-  //               <SelectItem value={org.id} key={org.id}>
-  //                 {org.name}
-  //               </SelectItem>
-  //             ))}
-  //         </SelectContent>
-  //       </Select>
-  //     );
-  //   },
-  // },
+  {
+    accessorKey: "",
+    header: "Actions",
+    cell: ({ row }) => {
+      return <MenuActions id={row.original.id} />;
+    },
+  },
 ];
 
-export default function TablesTable() {
+export default function ReservationsTable() {
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
@@ -204,7 +87,7 @@ export default function TablesTable() {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
   const [data, setData] = useState<{
-    rows: Reservation[];
+    rows: MenuItem[];
     totalCount: number;
   }>({
     rows: [],
@@ -234,35 +117,34 @@ export default function TablesTable() {
     manualPagination: true,
   });
 
-  const [emailFilter, setEmailFilter] = useState<string | undefined>(undefined);
+  const [nameFilter, setNameFilter] = useState<string | undefined>(undefined);
 
   /** Delay fetching after user input to reduce fetching */
   useEffect(() => {
     const timeout = setTimeout(() => {
-      setEmailFilter(table.getColumn("email")?.getFilterValue() as string);
+      setNameFilter(table.getColumn("email")?.getFilterValue() as string);
     }, 300);
     return () => clearTimeout(timeout);
   }, [table.getColumn("email")?.getFilterValue()]);
 
-  const { data: usersData, isLoading } =
-    api.reservations.getReservationsPaginated.useQuery({
-      ...pagination,
-      emailFilter,
-    });
+  const { data: menusData, isLoading } = api.menus.getMenusPaginated.useQuery({
+    ...pagination,
+    nameFilter,
+  });
 
   useEffect(() => {
-    if (usersData) setData(usersData);
-  }, [usersData]);
+    if (menusData) setData(menusData);
+  }, [menusData]);
 
   return (
     <>
       <div className="w-full">
         <div className="flex items-center py-4">
           <Input
-            placeholder="Filter emails..."
-            value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+            placeholder="Filter name..."
+            value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
             onChange={(event) =>
-              table.getColumn("email")?.setFilterValue(event.target.value)
+              table.getColumn("name")?.setFilterValue(event.target.value)
             }
             className="max-w-sm outline-none"
           />

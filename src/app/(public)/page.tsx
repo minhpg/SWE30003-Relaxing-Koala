@@ -1,6 +1,4 @@
-import Link from "next/link";
-import { getServerAuthSession } from "@/server/auth";
-import { api } from "@/trpc/server";
+import { buttonVariants } from "@/components/ui/button";
 import {
   PageActions,
   PageHeader,
@@ -8,10 +6,11 @@ import {
   PageHeaderHeading,
 } from "@/components/ui/page-header";
 import { cn } from "@/lib/utils";
-import { buttonVariants } from "@/components/ui/button";
+import { getServerAuthSession } from "@/server/auth";
+import Link from "next/link";
 import { Announcement } from "../_components/Announcement";
-import { Testimonials } from "../_components/Testimonials";
 import { MenuBentoGrid } from "../_components/MenuBentoGrid";
+import { Testimonials } from "../_components/Testimonials";
 
 export default async function Home() {
   const session = await getServerAuthSession();

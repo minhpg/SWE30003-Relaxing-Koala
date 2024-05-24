@@ -10,7 +10,7 @@ import { env } from "@/env";
 import { db } from "@/server/db";
 import { createTable, users } from "@/server/db/schema";
 import Google from "next-auth/providers/google";
-import { InferSelectModel } from "drizzle-orm";
+import { eq, InferSelectModel } from "drizzle-orm";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -22,10 +22,6 @@ declare module "next-auth" {
   interface Session extends DefaultSession {
     user: InferSelectModel<typeof users> & DefaultSession["user"];
   }
-
-  interface User {
-    role: InferSelectModel<typeof users>["role"];
-  }
 }
 
 /**
@@ -35,20 +31,24 @@ declare module "next-auth" {
  */
 export const authOptions: NextAuthOptions = {
   callbacks: {
-    session: ({ session, user }) => ({
-      ...session,
-      user: {
-        ...session.user,
-        id: user.id,
-      },
-    }),
+    session: async ({ session, user }) => {
+      const dbUser = await db.query.users.findFirst({
+        where: eq(users.id, user.id),
+      });
+      if (!dbUser) {
+        throw new Error("User not found");
+      }
+      return {
+        ...session,
+        user: {
+          ...dbUser,
+          id: user.id,
+        },
+      };
+    },
   },
   adapter: DrizzleAdapter(db, createTable) as Adapter,
   providers: [
-    // DiscordProvider({
-    //   clientId: env.DISCORD_CLIENT_ID,
-    //   clientSecret: env.DISCORD_CLIENT_SECRET,
-    // }),
     Google({
       clientId: env.GOOGLE_CLIENT_ID,
       clientSecret: env.GOOGLE_CLIENT_SECRET,

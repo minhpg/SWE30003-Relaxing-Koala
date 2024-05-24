@@ -1,12 +1,12 @@
-import Link from "next/link";
+import { Separator } from "@/components/ui/separator";
 import { ArrowRightIcon } from "@radix-ui/react-icons";
 import { Vegan } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
+import Link from "next/link";
 
 export function Announcement() {
   return (
     <Link
-      href="/docs/changelog"
+      href="/menu"
       className="inline-flex items-center rounded-lg bg-muted px-3 py-1 text-sm font-medium"
     >
       <Vegan className="h-4 w-4" />{" "}

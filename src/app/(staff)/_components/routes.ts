@@ -1,11 +1,11 @@
 export const routes = [
   {
-    name: "Dashboard",
-    href: "/dashboard",
-  },
-  {
     name: "Reservations",
     href: "/dashboard/reservations",
+  },
+  {
+    name: "Orders",
+    href: "/dashboard/orders",
   },
   {
     name: "Menus",
@@ -16,7 +16,15 @@ export const routes = [
     href: "/dashboard/menu-items",
   },
   {
-    name: "Tables",
-    href: "/dashboard/tables",
+    name: "Payments",
+    href: "/dashboard/payments",
+  },
+  {
+    name: "Users",
+    href: "/dashboard/users",
+  },
+  {
+    name: "Feedbacks",
+    href: "/dashboard/feedbacks",
   },
 ];

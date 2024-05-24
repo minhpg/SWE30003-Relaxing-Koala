@@ -45,7 +45,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-export default function ReservationActions({ id }: { id: number }) {
+export default function ReservationActions({
+  id,
+  disabled,
+}: {
+  id: number;
+  disabled: boolean;
+}) {
   const toast = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const { data: reservation, isLoading } =
@@ -101,19 +107,9 @@ export default function ReservationActions({ id }: { id: number }) {
 
   const form = useForm<z.infer<typeof editReservationSchema>>({
     resolver: zodResolver(editReservationSchema),
+    values: reservation,
     reValidateMode: "onChange",
   });
-
-  useEffect(() => {
-    if (reservation) {
-      form.setValue("name", reservation.name);
-      form.setValue("email", reservation.email);
-      form.setValue("phone", reservation.phone);
-      form.setValue("time", reservation.time);
-      form.setValue("noOfGuests", reservation.noOfGuests);
-      form.setValue("message", reservation.message);
-    }
-  }, [reservation]);
 
   const onSubmit: SubmitHandler<z.infer<typeof editReservationSchema>> = (
     values,
@@ -126,7 +122,7 @@ export default function ReservationActions({ id }: { id: number }) {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="ml-auto">
+          <Button variant="outline" className="ml-auto" disabled={disabled}>
             Actions <ChevronDown className="ml-2 h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
@@ -145,148 +141,142 @@ export default function ReservationActions({ id }: { id: number }) {
           <DialogDescription></DialogDescription>
         </DialogHeader>
 
-        {!reservation && !isLoading && <div>Reservation not found</div>}
-
-        {!reservation && isLoading && <div>Loading...</div>}
-
-        {reservation && (
-          <Form {...form}>
-            <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
-              <FormField
-                name="name"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Name" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                name="email"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Email" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                name="phone"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Phone</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Phone" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                name="time"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Date</FormLabel>
-                    <FormControl>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant={"outline"}
-                            className={cn(
-                              "w-full justify-start text-left font-normal",
-                              !field.value && "text-muted-foreground",
-                            )}
-                          >
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {field.value ? (
-                              format(field.value, "PPP HH:mm:ss")
-                            ) : (
-                              <span>Pick a date</span>
-                            )}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0">
-                          <Calendar
-                            fromDate={add(new Date(Date.now()), {
-                              days: 1,
-                            })}
-                            toDate={add(new Date(Date.now()), {
-                              days: 8,
-                            })}
-                            mode="single"
-                            showOutsideDays={false}
-                            selected={field.value}
-                            onSelect={(d) => field.onChange(d)}
-                            initialFocus
+        <Form {...form}>
+          <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+            <FormField
+              name="name"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="email"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Email" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="phone"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Phone</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Phone" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="time"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Date</FormLabel>
+                  <FormControl>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "w-full justify-start text-left font-normal",
+                            !field.value && "text-muted-foreground",
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {field.value ? (
+                            format(field.value, "PPP HH:mm:ss")
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0">
+                        <Calendar
+                          fromDate={add(new Date(Date.now()), {
+                            days: 1,
+                          })}
+                          toDate={add(new Date(Date.now()), {
+                            days: 8,
+                          })}
+                          mode="single"
+                          showOutsideDays={false}
+                          selected={field.value}
+                          onSelect={(d) => field.onChange(d)}
+                          initialFocus
+                        />
+                        <div className="border-t border-border p-3">
+                          <TimePickerDemo
+                            setDate={field.onChange}
+                            date={field.value}
                           />
-                          <div className="border-t border-border p-3">
-                            <TimePickerDemo
-                              setDate={field.onChange}
-                              date={field.value}
-                            />
-                          </div>
-                        </PopoverContent>
-                      </Popover>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                name="noOfGuests"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Number of guests</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="No. of guests"
-                        type="number"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="noOfGuests"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Number of guests</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="No. of guests"
+                      type="number"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              <FormField
-                name="message"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Notes</FormLabel>
-                    <FormControl>
-                      <Textarea {...field} value={field.value || ""} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <FormField
+              name="message"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Notes</FormLabel>
+                  <FormControl>
+                    <Textarea {...field} value={field.value || ""} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              <DialogFooter>
-                <DialogFooter className="gap-y-2">
-                  <Button type="submit">Submit</Button>
-                  <DialogClose asChild>
-                    <Button type="button" variant="secondary">
-                      Close
-                    </Button>
-                  </DialogClose>
-                </DialogFooter>
+            <DialogFooter>
+              <DialogFooter className="gap-y-2">
+                <Button type="submit">Submit</Button>
+                <DialogClose asChild>
+                  <Button type="button" variant="secondary">
+                    Close
+                  </Button>
+                </DialogClose>
               </DialogFooter>
-            </form>
-          </Form>
-        )}
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

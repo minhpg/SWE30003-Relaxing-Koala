@@ -1,19 +1,10 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import NewReservationDialog from "./_components/NewReservationDialog";
 import ReservationsTable from "./_components/ReservationsTable";
 
-export default function ReservationPage() {
+export default function ReservationsPage() {
   return (
     <>
       <div className="flex items-center justify-between space-y-2">

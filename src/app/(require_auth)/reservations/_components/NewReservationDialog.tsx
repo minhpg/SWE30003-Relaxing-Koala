@@ -1,64 +1,98 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { DateTimePicker } from "@/components/ui/date-time-picker";
+import { Calendar } from "@/components/ui/calendar";
+import { TimePickerDemo } from "@/components/ui/date-time-picker";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
-  DialogHeader,
-  DialogTrigger,
-  DialogTitle,
   DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
-import { useEffect, useState } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useSession } from "next-auth/react";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-
-export const newReservationSchema = z.object({
-  name: z.string(),
-  email: z.string().email(),
-  phone: z.string(),
-  time: z.date(),
-  noOfGuests: z.number(),
-  message: z.string(),
-});
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/components/ui/use-toast";
+import { reservationSchema } from "@/lib/schemas/reservations";
+import { cn } from "@/lib/utils";
+import { api } from "@/trpc/react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { add, format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { z } from "zod";
 
 export default function NewReservationDialog() {
+  const toast = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const { data: session } = useSession();
-  console.log(session);
-  const form = useForm<z.infer<typeof newReservationSchema>>({
-    resolver: zodResolver(newReservationSchema),
-    defaultValues: {
-      name: session?.user?.name || "",
-      email: session?.user?.email || "",
+
+  const form = useForm<z.infer<typeof reservationSchema>>({
+    resolver: zodResolver(reservationSchema),
+    defaultValues: {},
+    values: {
+      email: session?.user.email || "",
+      name: session?.user.name || "",
+      phone: "",
+      time: add(new Date(Date.now()), { days: 1 }),
+      noOfGuests: 2,
+      message: "",
     },
     reValidateMode: "onChange",
   });
 
-  useEffect(() => {
-    if (session && session.user) {
-      form.setValue("name", session.user.name || "");
-      form.setValue("email", session.user.email || "");
-    }
-  }, [session]);
+  const utils = api.useUtils();
 
-  const onSubmit: SubmitHandler<z.infer<typeof newReservationSchema>> = (
-    values,
-  ) => {};
+  const mutation = api.reservations.createReservation.useMutation({
+    onMutate: () => {
+      setIsOpen(false);
+    },
+    onSuccess: (data) => {
+      console.log(data);
+      if (!data) {
+        toast.toast({
+          title: "Failed to create reservation",
+          description: `Failed to create reservation for ${form.getValues().name}`,
+          variant: "destructive",
+        });
+        return;
+      }
+      toast.toast({
+        title: `Reservation created successfully`,
+        description: `Reservation created for ${data.name} at ${format(data.time, "PPP HH:mm:ss")}`,
+      });
+      utils.reservations.getUserReservationsPaginated.invalidate();
+      form.reset();
+    },
+    onError: () => {
+      toast.toast({
+        title: "Failed to create reservation",
+        description: `Failed to create reservation for ${form.getValues().name}`,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const onSubmit: SubmitHandler<z.infer<typeof reservationSchema>> = (values) =>
+    mutation.mutate(values);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -67,11 +101,12 @@ export default function NewReservationDialog() {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Book new reservation</DialogTitle>
+          <DialogTitle>Create new reservation</DialogTitle>
           <DialogDescription></DialogDescription>
         </DialogHeader>
+
         <Form {...form}>
-          <form className="space-y-4">
+          <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
             <FormField
               name="name"
               control={form.control}
@@ -116,12 +151,43 @@ export default function NewReservationDialog() {
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Date/Time</FormLabel>
-                  <FormDescription>
-                    Choose when you want to book
-                  </FormDescription>
+                  <FormLabel>Date</FormLabel>
                   <FormControl>
-                    <DateTimePicker {...field} />
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "w-full justify-start text-left font-normal",
+                            !field.value && "text-muted-foreground",
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {field.value ? (
+                            format(field.value, "PPP HH:mm:ss")
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0">
+                        <Calendar
+                          fromDate={add(new Date(Date.now()), { days: 1 })}
+                          toDate={add(new Date(Date.now()), { days: 8 })}
+                          mode="single"
+                          showOutsideDays={false}
+                          selected={field.value}
+                          onSelect={(d) => field.onChange(d)}
+                          initialFocus
+                        />
+                        <div className="border-t border-border p-3">
+                          <TimePickerDemo
+                            setDate={field.onChange}
+                            date={field.value}
+                          />
+                        </div>
+                      </PopoverContent>
+                    </Popover>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -132,26 +198,45 @@ export default function NewReservationDialog() {
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>No. of guests</FormLabel>
+                  <FormLabel>Number of guests</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="No. of guests"
-                      {...field}
                       type="number"
+                      {...field}
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
+            <FormField
+              name="message"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Notes</FormLabel>
+                  <FormControl>
+                    <Textarea {...field} value={field.value || ""} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <DialogFooter>
+              <DialogFooter className="gap-y-2">
+                <Button type="submit">Submit</Button>
+                <DialogClose asChild>
+                  <Button type="button" variant="secondary">
+                    Close
+                  </Button>
+                </DialogClose>
+              </DialogFooter>
+            </DialogFooter>
           </form>
         </Form>
-        <DialogFooter>
-          <Button>Submit</Button>
-          <Button variant={"destructive"} onClick={() => setIsOpen(false)}>
-            Cancel
-          </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

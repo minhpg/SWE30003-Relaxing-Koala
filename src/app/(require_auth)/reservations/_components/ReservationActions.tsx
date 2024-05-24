@@ -1,22 +1,24 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import { TimePickerDemo } from "@/components/ui/date-time-picker";
-import { add, format } from "date-fns";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
-  DialogHeader,
-  DialogTrigger,
-  DialogTitle,
   DialogFooter,
-  DialogClose,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
-import { useState } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Form,
   FormControl,
@@ -26,66 +28,116 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Calendar } from "@/components/ui/calendar";
-import { cn } from "@/lib/utils";
 import {
   Popover,
-  PopoverTrigger,
   PopoverContent,
+  PopoverTrigger,
 } from "@/components/ui/popover";
-import { CalendarIcon } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
-import { api } from "@/trpc/react";
 import { useToast } from "@/components/ui/use-toast";
-import { reservationSchema } from "@/lib/schemas/reservations";
+import { editReservationSchema } from "@/lib/schemas/reservations";
+import { cn } from "@/lib/utils";
+import { api } from "@/trpc/react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { add, format } from "date-fns";
+import { CalendarIcon, ChevronDown } from "lucide-react";
+import { useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { z } from "zod";
 
-export default function NewTableDialog() {
+export default function ReservationActions({
+  id,
+  disabled,
+}: {
+  id: number;
+  disabled: boolean;
+}) {
   const toast = useToast();
   const [isOpen, setIsOpen] = useState(false);
-  const form = useForm<z.infer<typeof reservationSchema>>({
-    resolver: zodResolver(reservationSchema),
-    defaultValues: {
-      time: add(new Date(Date.now()), { days: 1 }),
-      noOfGuests: 2,
+  const { data: reservation } =
+    api.reservations.getReservationById.useQuery(id);
+  const utils = api.useUtils();
+  const deleteMutation = api.reservations.deleteReservationById.useMutation({
+    onMutate: (data) => {
+      setIsOpen(false);
     },
-    reValidateMode: "onChange",
+    onSuccess: () => {
+      toast.toast({
+        title: `Reservation removed successfully`,
+        description: `Reservation removed for ${reservation?.name}`,
+      });
+      utils.reservations.getUserReservationsPaginated.invalidate();
+    },
+    onError: () => {
+      toast.toast({
+        title: "Failed to edited reservation",
+        description: `Failed to edited reservation for ${form.getValues().name}`,
+        variant: "destructive",
+      });
+    },
   });
-
-  const mutation = api.reservations.createReservation.useMutation({
+  const mutation = api.reservations.editReservation.useMutation({
+    onMutate: (data) => {
+      setIsOpen(false);
+    },
     onSuccess: (data) => {
+      console.log(data);
       if (!data) {
         toast.toast({
-          title: "Failed to create reservation",
-          description: `Failed to create reservation for ${form.getValues().name}`,
+          title: "Failed to edit reservation",
+          description: `Failed to edit reservation for ${form.getValues().name}`,
           variant: "destructive",
         });
         return;
       }
       toast.toast({
-        title: `Reservation created successfully`,
-        description: `Reservation created for ${data.name} at ${format(data.time, "PPP HH:mm:ss")}`,
+        title: `Reservation edited successfully`,
+        description: `Reservation edited for ${data.name} at ${format(data.time, "PPP HH:mm:ss")}`,
       });
+      utils.reservations.getUserReservationsPaginated.invalidate();
     },
     onError: () => {
       toast.toast({
-        title: "Failed to create reservation",
-        description: `Failed to create reservation for ${form.getValues().name}`,
+        title: "Failed to edited reservation",
+        description: `Failed to edited reservation for ${form.getValues().name}`,
         variant: "destructive",
       });
     },
   });
 
-  const onSubmit: SubmitHandler<z.infer<typeof reservationSchema>> = (values) =>
+  const form = useForm<z.infer<typeof editReservationSchema>>({
+    resolver: zodResolver(editReservationSchema),
+    values: reservation,
+    reValidateMode: "onChange",
+  });
+
+  const onSubmit: SubmitHandler<z.infer<typeof editReservationSchema>> = (
+    values,
+  ) => {
+    console.log(values);
     mutation.mutate(values);
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button>New table</Button>
-      </DialogTrigger>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" className="ml-auto" disabled={disabled}>
+            Actions <ChevronDown className="ml-2 h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DialogTrigger asChild>
+            <DropdownMenuItem>Update</DropdownMenuItem>
+          </DialogTrigger>
+          <DropdownMenuItem onClick={() => deleteMutation.mutate(id)}>
+            Delete
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create new table</DialogTitle>
+          <DialogTitle>Update reservation</DialogTitle>
           <DialogDescription></DialogDescription>
         </DialogHeader>
 
@@ -156,8 +208,12 @@ export default function NewTableDialog() {
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0">
                         <Calendar
-                          fromDate={add(new Date(Date.now()), { days: 1 })}
-                          toDate={add(new Date(Date.now()), { days: 8 })}
+                          fromDate={add(new Date(Date.now()), {
+                            days: 1,
+                          })}
+                          toDate={add(new Date(Date.now()), {
+                            days: 8,
+                          })}
                           mode="single"
                           showOutsideDays={false}
                           selected={field.value}

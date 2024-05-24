@@ -37,6 +37,7 @@ const config = {
     "@typescript-eslint/consistent-indexed-object-style": "warn",
     "@typescript-eslint/no-unnecessary-type-assertion": "warn",
     "@typescript-eslint/no-unsafe-return": "warn",
+    "@typescript-eslint/no-base-to-string": "warn",
     "react-hooks/exhaustive-deps": "off",
     "react-hooks/rules-of-hooks": "off", // Checks rules of Hooks
     "drizzle/enforce-update-with-where": [

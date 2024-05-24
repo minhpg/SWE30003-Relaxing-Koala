@@ -28,7 +28,7 @@ import { Input } from "@/components/ui/input";
 import { api } from "@/trpc/react";
 import { InferSelectModel } from "drizzle-orm";
 import { reservations } from "@/server/db/schema";
-import { format } from "date-fns";
+import { format, isBefore } from "date-fns";
 import { ArrowDown, ChevronDown } from "lucide-react";
 import {
   Table,
@@ -40,11 +40,7 @@ import {
 } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import ReservationActions from "./ReservationActions";
-
-export interface UsersTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-}
+import { Badge } from "@/components/ui/badge";
 
 export type Reservation = InferSelectModel<typeof reservations>;
 
@@ -72,7 +68,15 @@ export const columns: ColumnDef<Reservation>[] = [
     accessorKey: "time",
     header: "Time",
     cell: ({ row }) => {
-      return format(row.original.time, "dd/MM/yyyy - hh:mm");
+      return (
+        <Badge
+          variant={
+            isBefore(row.original.time, new Date()) ? "destructive" : "default"
+          }
+        >
+          {format(row.original.time, "dd/MM/yyyy - hh:mm")}
+        </Badge>
+      );
     },
   },
   {
@@ -86,125 +90,14 @@ export const columns: ColumnDef<Reservation>[] = [
     accessorKey: "",
     header: "Actions",
     cell: ({ row }) => {
-      return <ReservationActions id={row.original.id} />;
+      return (
+        <ReservationActions
+          id={row.original.id}
+          disabled={isBefore(row.original.time, new Date())}
+        />
+      );
     },
   },
-  // {
-  //   accessorKey: "createdAt",
-  //   header: "Created at",
-  //   cell: ({ row }) => {
-  //     return format(row.original.createdAt, "dd/MM/yyyy");
-  //   },
-  // },
-  // {
-  //   accessorKey: "role",
-  //   header: "Role",
-  //   cell: ({ row }) => {
-  //     const toast = useToast();
-  //     // const utils = api.useUtils();
-
-  //     // const roleMutation = api..updateUserRole.useMutation({
-  //     //   onSuccess: () => {
-  //     //     toast.toast({
-  //     //       title: "Update success",
-  //     //       description: `Updated role for ${row.original.name} - ${row.original.email}`,
-  //     //     });
-  //     //     // utils.users.getUsersPaginated.refetch();
-  //     //   },
-  //     //   onError: () => {
-  //     //     toast.toast({
-  //     //       title: "Update failed",
-  //     //       description: `Fail to update role for ${row.original.name} - ${row.original.email}`,
-  //     //       variant: "destructive",
-  //     //     });
-  //     //   },
-  //     // });
-
-  //     return (
-  //       <Select
-  //         defaultValue={row.original.role || "Not selected"}
-  //         onValueChange={async (value) => {
-  //           await roleMutation.mutate({
-  //             userId: row.original.id,
-  //             role: value as (typeof roles)[number],
-  //           });
-  //         }}
-  //       >
-  //         <SelectTrigger>
-  //           <SelectValue></SelectValue>
-  //         </SelectTrigger>
-  //         <SelectContent>
-  //           {roles.map((role) => (
-  //             <SelectItem value={role} key={role}>
-  //               {role}
-  //             </SelectItem>
-  //           ))}
-  //         </SelectContent>
-  //       </Select>
-  //     );
-  //   },
-  // },
-  // {
-  //   accessorKey: "organizationId",
-  //   header: "Organization",
-  //   cell: ({ row }) => {
-  //     const toast = useToast();
-  //     // const utils = api.useUtils();
-
-  //     const roleMutation = api.users.updateUserOrganization.useMutation({
-  //       onSuccess: () => {
-  //         toast.toast({
-  //           title: "Update success",
-  //           description: `Updated organization for ${row.original.name} - ${row.original.email}`,
-  //         });
-  //         // utils.users.getUsersPaginated.refetch();
-  //       },
-  //       onError: () => {
-  //         toast.toast({
-  //           title: "Update failed",
-  //           description: `Fail to update organization for ${row.original.name} - ${row.original.email}`,
-  //           variant: "destructive",
-  //         });
-  //       },
-  //     });
-
-  //     const { data: organizations } =
-  //       api.organizations.getOrganizationsPaginated.useQuery({
-  //         pageIndex: 0,
-  //         pageSize: 10,
-  //       });
-
-  //     return (
-  //       <Select
-  //         defaultValue={row.original.organizationId || "Not selected"}
-  //         onValueChange={async (value) => {
-  //           await roleMutation.mutate({
-  //             userId: row.original.id,
-  //             organizationId: value as string,
-  //           });
-  //         }}
-  //       >
-  //         <SelectTrigger>
-  //           <SelectValue placeholder="Select an organization"></SelectValue>
-  //         </SelectTrigger>
-  //         <SelectContent>
-  //           {!organizations && (
-  //             <div className="flex w-full justify-center">
-  //               <RiLoader4Fill className="h-6 w-6 animate-spin text-primary" />
-  //             </div>
-  //           )}
-
-  //           {organizations &&
-  //             organizations.rows.map((org) => (
-  //               <SelectItem value={org.id} key={org.id}>
-  //                 {org.name}
-  //               </SelectItem>
-  //             ))}
-  //         </SelectContent>
-  //       </Select>
-  //     );
-  //   },
-  // },
 ];
 
 export default function ReservationsTable() {
