@@ -3,7 +3,7 @@ import Image from "next/image";
 
 export function MenuBentoGrid() {
   return (
-    <BentoGrid className="px-5">
+    <BentoGrid>
       {items.map((item, i) => (
         <BentoGridItem
           key={i}

@@ -11,7 +11,7 @@ export function Announcement() {
     >
       <Vegan className="h-4 w-4" />{" "}
       <Separator className="mx-2 h-4" orientation="vertical" />{" "}
-      <span>Introducing Our Vegan-friendly Menu</span>
+      <span>New Vegan-friendly Menu</span>
       <ArrowRightIcon className="ml-1 h-4 w-4" />
     </Link>
   );
